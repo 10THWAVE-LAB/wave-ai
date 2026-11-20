@@ -1,1 +1,19 @@
-{"dependencies":{"hono":"^4.0.0"},"description":"WAVE AI — a ChatGPT-style AI chat web app with freemium subscriptions. Free AI powered by Pollinations (no API key needed). Runs on Cloudflare Workers + D1.","devDependencies":{"wrangler":"^4.0.0"},"license":"MIT","main":"src/index.js","name":"wave-ai","scripts":{"deploy":"wrangler deploy","dev":"wrangler dev --local"},"version":"2.0.0"}
+{
+  "dependencies": {
+    "hono": "^4.0.0"
+  },
+  "description": "WAVE AI — a ChatGPT-style AI chat web app with freemium subscriptions. Free AI powered by Pollinations (no API key needed). Runs on Cloudflare Workers + D1.",
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "wrangler": "^4.0.0"
+  },
+  "license": "MIT",
+  "main": "src/index.js",
+  "name": "wave-ai",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev --local",
+    "build": "node scripts/build-assets.mjs && esbuild src/index.js --bundle --format=esm --platform=browser --outfile=dist/worker.js"
+  },
+  "version": "2.0.0"
+}

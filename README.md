@@ -25,10 +25,11 @@ grants 30 days of Pro. **Stripe (optional):** set a Stripe Payment Link and a
 ## Tech
 
 Cloudflare Workers (Hono) · D1 (SQLite) · PBKDF2 passwords (WebCrypto) · JWT
-sessions in an httpOnly cookie · vanilla JS frontend served as static assets.
-No paid services, no build step. The database lives in D1, so users, chats,
-and payments **persist** across deploys (unlike the old Render free tier,
-whose disk was wiped on restart).
+sessions in an httpOnly cookie · vanilla JS frontend bundled into the
+script (`scripts/build-assets.mjs` + esbuild — the Workers Script Upload
+API cannot take static assets). No paid services. The database lives in
+D1, so users, chats, and payments **persist** across deploys (unlike the
+old Render free tier, whose disk was wiped on restart).
 
 The original Node + Express version is preserved on the `express-legacy`
 branch.
@@ -47,32 +48,45 @@ npm run dev   # wrangler dev --local, no Cloudflare account needed
 Then open http://localhost:8787 — sign up with the `ADMIN_EMAIL` address to
 become the admin. Local D1 data is stored under `.wrangler/` (gitignored).
 
+After changing anything under `public/`, re-run `npm run build` so the
+bundled frontend (`src/assets.js`, committed) stays in sync — `npm run dev`
+serves the bundle, not the `public/` files directly.
+
 ## Deploy on Cloudflare (free)
 
 Cloudflare's free tier needs **no credit card** and allows commercial use,
 which is why WAVE AI lives here (Render requires a card; Koyeb removed its
 free tier for new accounts after joining Mistral AI).
 
-1. **Create the D1 database** (once):
+**Recommended: the API deploy helper.** The Cloudflare dashboard sign-up
+is blocked by Turnstile in some browsers, so deployment goes through the
+Cloudflare API instead:
+
+1. **Create a free Cloudflare account** on your own device, then an API
+   token (My Profile → API Tokens → Create Token → the **"Edit Cloudflare
+   Workers"** template, which covers Workers Scripts and D1).
+2. **Run the deploy helper** (it uses the API token from Muse's Secure
+   Vault — never paste the token into chat or a file):
    ```bash
-   npx wrangler d1 create wave-ai-db
+   python3 scripts/cloudflare_api_deploy.py
    ```
-   Copy the `database_id` it prints into `wrangler.toml`, replacing
-   `PLACEHOLDER-REPLACE-AFTER-D1-CREATED`, and push the change. The tables
-   are created automatically on the first API request — no migration step.
-2. **Set the secrets** (never commit them):
-   ```bash
-   npx wrangler secret put SESSION_SECRET   # paste a fresh `openssl rand -hex 32`
-   npx wrangler secret put ADMIN_EMAIL      # the email you will sign up with
-   ```
-3. **Deploy.** Either connect the repo in the dashboard (Workers & Pages →
-   Create → Workers → Import a repository, so every push auto-deploys), or:
-   ```bash
-   npm run deploy   # wrangler deploy
-   ```
-4. **Sign up.** Open your `*.workers.dev` URL, sign up with the admin email,
+   It finds (or creates) the D1 database `wave-ai-db`, builds and uploads
+   the Worker, sets the `SESSION_SECRET` and `ADMIN_EMAIL` secrets, and
+   checks the live `/healthz` endpoint. The tables are created
+   automatically on the first API request — no migration step. It also
+   prints the `database_id`: patch it into `wrangler.toml` (replacing
+   `PLACEHOLDER-REPLACE-AFTER-D1-CREATED`) for future wrangler deploys.
+
+**Alternative: wrangler or the dashboard.** Create the D1 database
+(`npx wrangler d1 create wave-ai-db`), patch the `database_id` into
+`wrangler.toml`, set the secrets (`npx wrangler secret put SESSION_SECRET`
+and `ADMIN_EMAIL`), then `npm run deploy` — or connect the repo in the
+dashboard (Workers & Pages → Create → Workers → Import a repository) so
+every push auto-deploys.
+
+3. **Sign up.** Open your `*.workers.dev` URL, sign up with the admin email,
    then open `/admin`.
-5. **Configure payments in `/admin`:** enter your GCash number + name, check
+4. **Configure payments in `/admin`:** enter your GCash number + name, check
    the Pro price (₱149) and free daily limit (20). Optionally paste a Stripe
    Payment Link to enable card payments.
 

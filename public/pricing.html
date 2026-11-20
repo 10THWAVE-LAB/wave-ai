@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing — WAVE AI</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a class="logo" href="/"><span class="logo-mark">🌊</span> WAVE&nbsp;AI</a>
+    <div class="nav-links">
+      <a class="nav-link" href="/">Home</a>
+      <a class="btn-ghost" href="/login">Log in</a>
+      <a class="btn btn-sm" href="/app">Open the app</a>
+    </div>
+  </nav>
+
+  <section class="section">
+    <h2>Simple pricing</h2>
+    <p class="sub">Start free. Upgrade only if you want unlimited.</p>
+
+    <div class="plans">
+      <div class="plan" id="free-plan">
+        <h3>Free</h3>
+        <div class="price">₱0<small> / forever</small></div>
+        <ul>
+          <li><span id="free-limit-text">20 AI messages per day</span></li>
+          <li>Full chat history</li>
+          <li>Code &amp; Markdown answers</li>
+          <li>Works on phone &amp; desktop</li>
+        </ul>
+        <a class="btn-ghost" href="/app">Start free</a>
+      </div>
+
+      <div class="plan pro" id="pro-plan">
+        <span class="badge">MOST POPULAR</span>
+        <h3>Pro</h3>
+        <div class="price"><span id="pro-price">₱149</span><small> / month</small></div>
+        <ul>
+          <li>Unlimited AI messages</li>
+          <li>Priority speed</li>
+          <li>Everything in Free</li>
+          <li>Pay with GCash or card</li>
+        </ul>
+
+        <div id="pro-status"></div>
+
+        <div id="gcash-box">
+          <h3 style="margin-bottom:4px">Pay with GCash</h3>
+          <p style="color:var(--muted);font-size:14px;margin-bottom:12px">
+            Send <strong id="gcash-amount" style="color:var(--text)">₱149</strong> to:
+          </p>
+          <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+            <div style="font-size:20px;font-weight:800" id="gcash-number">—</div>
+            <div style="color:var(--muted);font-size:14px" id="gcash-name"></div>
+          </div>
+          <div class="error-box" id="pay-error"></div>
+          <div class="success-box" id="pay-success"></div>
+          <form id="gcash-form">
+            <div class="field">
+              <label for="ref-number">GCash reference number</label>
+              <input type="text" id="ref-number" placeholder="e.g. 1234567890123" maxlength="100" required>
+            </div>
+            <div class="field">
+              <label for="pay-amount">Amount paid (₱)</label>
+              <input type="number" id="pay-amount" min="1" step="0.01" placeholder="149" required>
+            </div>
+            <button class="btn" type="submit" id="gcash-submit" style="width:100%">I've paid — activate Pro</button>
+          </form>
+          <p style="color:var(--muted);font-size:12.5px;margin-top:10px">
+            Your Pro is activated after we verify your payment — usually within a few hours.
+          </p>
+        </div>
+
+        <div id="stripe-box" style="display:none;margin-top:6px">
+          <a class="btn-ghost" id="stripe-btn" href="#" target="_blank" rel="noopener" style="width:100%;text-align:center">Pay with card (Stripe)</a>
+        </div>
+
+        <div id="login-needed" style="display:none">
+          <a class="btn" href="/login?next=/pricing" style="width:100%">Log in to upgrade</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="my-payments" style="max-width:820px;margin:24px auto 0;display:none">
+      <h3 style="margin-bottom:10px">Your payments</h3>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Date</th><th>Reference</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody id="payments-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p><strong style="color:var(--text)">🌊 WAVE AI</strong> — Chat with AI, free.</p>
+    <p style="margin-top:6px"><a href="/">Home</a> · <a href="/app">Open the app</a></p>
+  </footer>
+  <script src="/js/common.js"></script>
+  <script src="/js/pricing.js"></script>
+</body>
+</html>

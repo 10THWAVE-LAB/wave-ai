@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WAVE AI — Chat</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <button class="btn" id="new-chat-btn">＋ New chat</button>
+      </div>
+      <div class="convo-list" id="convo-list"></div>
+      <div class="sidebar-foot">
+        <div id="usage-block">
+          <div class="row"><span id="usage-label">Loading…</span><span id="usage-count"></span></div>
+          <div class="usage-bar"><div id="usage-fill" style="width:0%"></div></div>
+        </div>
+        <div class="row">
+          <span id="user-email" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+          <span id="plan-pill"></span>
+        </div>
+        <div class="row">
+          <a href="/pricing">Upgrade to Pro</a>
+          <a href="#" id="admin-link" style="display:none">Admin</a>
+          <a href="#" id="logout-link">Log out</a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="chat-header">
+        <button class="menu-btn" id="menu-btn" aria-label="Menu">☰</button>
+        <h2 id="chat-title">WAVE AI</h2>
+        <span class="model" id="model-label">Free AI · no key needed</span>
+      </header>
+
+      <div class="messages" id="messages">
+        <div class="empty-state" id="empty-state">
+          <h1>🌊 <span class="grad-text">How can I help?</span></h1>
+          <p>Ask WAVE AI anything — homework, code, writing, ideas, or everyday questions.</p>
+          <div class="suggestions">
+            <button class="suggestion" data-prompt="Explain photosynthesis in simple words, like I'm in high school.">Explain a topic simply<span>“Explain photosynthesis in simple words…”</span></button>
+            <button class="suggestion" data-prompt="Write a short professional email asking for a one-week extension on a project deadline.">Write an email<span>Professional, polite, ready to send</span></button>
+            <button class="suggestion" data-prompt="Give me a simple Python program that prints the first 10 Fibonacci numbers, and explain how it works.">Help me code<span>Python, JavaScript, and more</span></button>
+            <button class="suggestion" data-prompt="Give me 5 healthy and cheap meal ideas I can cook at home in the Philippines.">Ideas &amp; planning<span>Meals, trips, study plans</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="composer">
+        <div class="limit-banner" id="limit-banner" style="display:none"></div>
+        <div class="composer-box">
+          <textarea id="composer-input" rows="1" placeholder="Message WAVE AI…" maxlength="4000"></textarea>
+          <button class="send-btn" id="send-btn" aria-label="Send">➤</button>
+          <button class="stop-btn" id="stop-btn" style="display:none" aria-label="Stop">■</button>
+        </div>
+        <p class="composer-note">WAVE AI can make mistakes. Check important information.</p>
+      </div>
+    </main>
+  </div>
+  <script src="/js/common.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

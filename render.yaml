@@ -1,0 +1,31 @@
+# Render blueprint — deploys WAVE AI as one free web service.
+# Usage: push this repo to GitHub, then in Render choose
+# New > Blueprint and point it at the repo. Render reads this file.
+services:
+  - type: web
+    name: wave-ai
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: AI_BASE_URL
+        value: https://text.pollinations.ai/openai
+      - key: AI_MODEL
+        value: openai-fast
+      - key: PRO_PRICE_PHP
+        value: "149"
+      - key: FREE_DAILY_LIMIT
+        value: "20"
+      - key: GCASH_NUMBER
+        sync: false
+      - key: GCASH_NAME
+        sync: false
+      - key: STRIPE_PAYMENT_LINK
+        sync: false

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log in — WAVE AI</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="center-wrap">
+    <a class="logo" href="/" style="margin-bottom:24px"><span class="logo-mark">🌊</span> WAVE&nbsp;AI</a>
+    <div class="auth-card">
+      <h1 id="auth-title">Welcome back</h1>
+      <p class="muted" id="auth-sub">Log in to continue chatting with WAVE AI.</p>
+      <div class="error-box" id="auth-error"></div>
+      <form id="auth-form">
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="you@example.com" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="At least 8 characters" autocomplete="current-password" minlength="8" required>
+        </div>
+        <button class="btn" type="submit" id="auth-submit">Log in</button>
+      </form>
+      <p class="auth-switch" id="auth-switch">
+        No account yet? <a href="/signup">Sign up free</a>
+      </p>
+    </div>
+    <p style="margin-top:18px;font-size:13px;color:var(--muted)">Free plan: 20 AI messages every day.</p>
+  </div>
+  <script src="/js/common.js"></script>
+  <script src="/js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — WAVE AI</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a class="logo" href="/"><span class="logo-mark">🌊</span> WAVE&nbsp;AI</a>
+    <div class="nav-links">
+      <a class="nav-link" href="/app">Chat app</a>
+      <a class="btn-ghost" href="#" id="logout-link">Log out</a>
+    </div>
+  </nav>
+
+  <div class="admin-wrap">
+    <h1>Admin dashboard</h1>
+    <p class="muted">Users, payments, and site settings for WAVE AI.</p>
+    <div class="error-box" id="admin-error"></div>
+
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-users">—</div><div class="lbl">Total users</div></div>
+      <div class="stat"><div class="num" id="stat-pro">—</div><div class="lbl">Pro users</div></div>
+      <div class="stat"><div class="num" id="stat-messages">—</div><div class="lbl">AI messages today</div></div>
+      <div class="stat"><div class="num" id="stat-pending">—</div><div class="lbl">Pending payments</div></div>
+    </div>
+
+    <section class="admin-section">
+      <h2>Payments</h2>
+      <div class="card" style="padding:0">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Date</th><th>User</th><th>Reference</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+            <tbody id="payments-body">
+              <tr><td colspan="6" style="color:var(--muted)">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="admin-section">
+      <h2>Users</h2>
+      <div class="card" style="padding:0">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Email</th><th>Plan</th><th>Pro until</th><th>Joined</th></tr></thead>
+            <tbody id="users-body">
+              <tr><td colspan="4" style="color:var(--muted)">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="admin-section">
+      <h2>Settings</h2>
+      <p class="muted" style="margin-bottom:14px">Changes apply immediately — no redeploy needed.</p>
+      <div class="success-box" id="settings-success"></div>
+      <form id="settings-form">
+        <div class="settings-grid">
+          <div class="field">
+            <label for="set-gcash-number">GCash number</label>
+            <input type="text" id="set-gcash-number" placeholder="09XX-XXX-XXXX">
+          </div>
+          <div class="field">
+            <label for="set-gcash-name">GCash account name</label>
+            <input type="text" id="set-gcash-name" placeholder="e.g. Juan Dela Cruz">
+          </div>
+          <div class="field">
+            <label for="set-pro-price">Pro price (₱ / month)</label>
+            <input type="number" id="set-pro-price" min="0" step="1">
+          </div>
+          <div class="field">
+            <label for="set-free-limit">Free messages per day</label>
+            <input type="number" id="set-free-limit" min="1" step="1">
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label for="set-stripe-link">Stripe Payment Link (optional — leave blank to hide the card button)</label>
+            <input type="url" id="set-stripe-link" placeholder="https://buy.stripe.com/…">
+          </div>
+        </div>
+        <button class="btn" type="submit" id="settings-submit" style="margin-top:16px">Save settings</button>
+      </form>
+    </section>
+  </div>
+  <script src="/js/common.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

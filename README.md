@@ -24,62 +24,74 @@ grants 30 days of Pro. **Stripe (optional):** set a Stripe Payment Link and a
 
 ## Tech
 
-Node.js 20+ · Express · SQLite (`better-sqlite3`, single file) · bcryptjs
-passwords · JWT sessions in an httpOnly cookie · vanilla JS frontend.
-No paid services, no build step.
+Cloudflare Workers (Hono) · D1 (SQLite) · PBKDF2 passwords (WebCrypto) · JWT
+sessions in an httpOnly cookie · vanilla JS frontend served as static assets.
+No paid services, no build step. The database lives in D1, so users, chats,
+and payments **persist** across deploys (unlike the old Render free tier,
+whose disk was wiped on restart).
+
+The original Node + Express version is preserved on the `express-legacy`
+branch.
 
 ## Run locally
 
 ```bash
 npm install
-SESSION_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))") \
-ADMIN_EMAIL=you@example.com \
-npm start
+# .dev.vars holds local secrets (gitignored). Fill in SESSION_SECRET with a
+# fresh random value and ADMIN_EMAIL with your email:
+#   SESSION_SECRET=$(openssl rand -hex 32)
+#   ADMIN_EMAIL=you@example.com
+npm run dev   # wrangler dev --local, no Cloudflare account needed
 ```
 
-Then open http://localhost:3000 — sign up with the `ADMIN_EMAIL` address to
-become the admin. (Or copy `.env.example` to `.env` and fill it in — but note
-this project does not auto-load `.env`; export the variables or use
-`env $(cat .env | xargs) npm start` in development.)
+Then open http://localhost:8787 — sign up with the `ADMIN_EMAIL` address to
+become the admin. Local D1 data is stored under `.wrangler/` (gitignored).
 
-## Deploy on Render (free)
+## Deploy on Cloudflare (free)
 
-1. **Push to GitHub.** Create a repo (e.g. `10THWAVE-LAB/wave-ai`) and push
-   this folder:
+Cloudflare's free tier needs **no credit card** and allows commercial use,
+which is why WAVE AI lives here (Render requires a card; Koyeb removed its
+free tier for new accounts after joining Mistral AI).
+
+1. **Create the D1 database** (once):
    ```bash
-   git init
-   git add .
-   git commit -m "WAVE AI v1"
-   git remote add origin https://github.com/10THWAVE-LAB/wave-ai.git
-   git push -u origin main
+   npx wrangler d1 create wave-ai-db
    ```
-2. **Create the service.** In [Render](https://render.com): **New → Blueprint**,
-   connect the repo. Render reads `render.yaml` and creates a free web
-   service with `SESSION_SECRET` auto-generated.
-3. **Set `ADMIN_EMAIL`.** In Render → your service → **Environment**, set
-   `ADMIN_EMAIL` to the email you will sign up with, then **Manual Deploy →
-   Deploy latest commit** (env changes need a redeploy to take effect).
-4. **Sign up.** Open your Render URL (`https://wave-ai.onrender.com`), sign up
-   with the admin email, then open `/admin`.
+   Copy the `database_id` it prints into `wrangler.toml`, replacing
+   `PLACEHOLDER-REPLACE-AFTER-D1-CREATED`, and push the change. The tables
+   are created automatically on the first API request — no migration step.
+2. **Set the secrets** (never commit them):
+   ```bash
+   npx wrangler secret put SESSION_SECRET   # paste a fresh `openssl rand -hex 32`
+   npx wrangler secret put ADMIN_EMAIL      # the email you will sign up with
+   ```
+3. **Deploy.** Either connect the repo in the dashboard (Workers & Pages →
+   Create → Workers → Import a repository, so every push auto-deploys), or:
+   ```bash
+   npm run deploy   # wrangler deploy
+   ```
+4. **Sign up.** Open your `*.workers.dev` URL, sign up with the admin email,
+   then open `/admin`.
 5. **Configure payments in `/admin`:** enter your GCash number + name, check
    the Pro price (₱149) and free daily limit (20). Optionally paste a Stripe
    Payment Link to enable card payments.
 
 ### Free-tier notes (read this)
 
-- **Render's free tier spins down after 15 minutes of inactivity** — the first
-  visit after a nap takes ~30–60 seconds to wake up. That is normal.
-- **Free-tier disk is ephemeral:** the SQLite database (users, chats,
-  payments) is wiped when the service restarts or redeploys. That is fine for
-  launching and testing. Once real users and paying subscribers arrive, add a
-  Render persistent disk (paid, ~$0.25/GB/month) or move to Render Postgres
-  before you have subscribers you care about.
-- **Back up the database** before redeploying if it matters: download
-  `wave-ai.db` from the Render shell.
+- **Workers free tier:** 100,000 requests/day, 10 ms CPU per request. Chat
+  replies stream, so long AI answers are fine — waiting on the AI does not
+  burn CPU. Password hashing uses PBKDF2 (WebCrypto), which is the
+  Workers-friendly choice; bcrypt would exceed the CPU budget.
+- **D1 free tier:** 5M rows read/day, 100k rows written/day, 500 MB storage.
+  Plenty for launch. Rate limiting is D1-backed (Workers have no reliable
+  in-memory state).
+- **The database persists** — users and Pro subscriptions survive redeploys.
+  Back it up before risky changes: `npx wrangler d1 export wave-ai-db`.
 
 ## Owner setup checklist
 
-- [ ] Deploy on Render, set `ADMIN_EMAIL`
+- [ ] Create the D1 database, patch `database_id` in `wrangler.toml`, deploy
+- [ ] Set `SESSION_SECRET` and `ADMIN_EMAIL` secrets
 - [ ] Sign up with the admin email, open `/admin`
 - [ ] Set GCash number + name in `/admin` → Settings
 - [ ] (Optional) Create a Stripe Payment Link for ₱149/month and paste it in
@@ -90,7 +102,7 @@ this project does not auto-load `.env`; export the variables or use
 ## Changing prices and limits
 
 In `/admin` → Settings (applies immediately, no redeploy), or via env vars
-`PRO_PRICE_PHP` and `FREE_DAILY_LIMIT`.
+`PRO_PRICE_PHP` and `FREE_DAILY_LIMIT` in `wrangler.toml`.
 
 ## API overview
 
@@ -106,7 +118,8 @@ In `/admin` → Settings (applies immediately, no redeploy), or via env vars
 
 ## Security notes
 
-- Passwords are bcrypt-hashed; sessions are signed JWTs in httpOnly cookies.
+- Passwords are PBKDF2-hashed (WebCrypto, 100,000 iterations, random salt);
+  sessions are signed JWTs in httpOnly cookies.
 - The AI API is called from the server only — the browser never sees it.
-- Auth and chat endpoints have basic in-memory rate limiting.
-- Never commit `.env` or `*.db` files (see `.gitignore`).
+- Auth, chat, and payment endpoints have D1-backed rate limiting.
+- Never commit `.dev.vars`, `.env`, or secrets (see `.gitignore`).
